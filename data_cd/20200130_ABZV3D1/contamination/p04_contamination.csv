@@ -1,0 +1,9 @@
+row,1,2,3,4,5,6,7,8,9,10,11,12
+A,,,,,,,,,,,,
+B,TRUE,,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,,,
+C,,,,,,,,,,,,
+D,,TRUE,TRUE,TRUE,,TRUE,,TRUE,TRUE,TRUE,,
+E,,,TRUE,TRUE,,,,,,,,
+F,,,,,,,,,,,,
+G,,,,,,,,,,,,
+H,,,,,,,,,,,,
