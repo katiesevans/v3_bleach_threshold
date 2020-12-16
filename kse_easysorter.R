@@ -24,7 +24,7 @@ unique(kse_data$bleach)
 
 # plot all strains together
 kse_data %>%
-    dplyr::filter(strain == "N2") %>%
+    # dplyr::filter(strain == "N2") %>%
     tidyr::gather(trait, phenotype, TOF:EXT) %>%
     # dplyr::group_by(trait) %>%
     # dplyr::mutate(quant = quantile(phenotype, probs = 0.05)) %>%
@@ -32,7 +32,21 @@ kse_data %>%
     aes(x = phenotype) +
     geom_histogram(bins = 150) +
     theme_bw() +
-    facet_grid(date~trait, scales = "free")
+    facet_grid(bleach~trait, scales = "free")
+
+# graph density plot instead
+kse_data %>%
+    # dplyr::filter(strain == "N2") %>%
+    tidyr::gather(trait, phenotype, TOF:EXT) %>%
+    # dplyr::group_by(trait) %>%
+    # dplyr::mutate(quant = quantile(phenotype, probs = 0.05)) %>%
+    ggplot(.) +
+    aes(x = phenotype, color = bleach) +
+    geom_density() +
+    # stat_ecdf() +
+    # geom_histogram(bins = 150) +
+    theme_bw() +
+    facet_grid(~trait, scales = "free")
 
 # only N2
 kse_data %>%
@@ -137,7 +151,21 @@ CD_data %>%
     aes(x = phenotype) +
     geom_histogram(bins = 150) +
     theme_bw() +
-    facet_grid(date~trait, scales = "free")
+    facet_grid(bleach~trait, scales = "free")
+
+# graph density plot instead
+CD_data %>%
+    # dplyr::filter(strain == "N2") %>%
+    tidyr::gather(trait, phenotype, TOF:EXT) %>%
+    # dplyr::group_by(trait) %>%
+    # dplyr::mutate(quant = quantile(phenotype, probs = 0.05)) %>%
+    ggplot(.) +
+    aes(x = phenotype, color = bleach) +
+    geom_density() +
+    # stat_ecdf() +
+    # geom_histogram(bins = 150) +
+    theme_bw() +
+    facet_grid(~trait, scales = "free")
 
 ############ loraina data
 #Define a vector of your experiement directories
@@ -269,6 +297,7 @@ LS_data %>%
 
 all_data <- kse_data %>%
     dplyr::bind_rows(DL_data, CD_data, LS_data)
+save(all_data, file = "~/Dropbox/AndersenLab/LabFolders/Katie/git/v3_bleach_threshold/all_data.Rda")
 
 # plot
 all_data %>%
