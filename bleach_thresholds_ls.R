@@ -127,10 +127,9 @@ mean(all_nocontam$TOF) # 351
 mean(all_nocontam$EXT) #919
 
 
-# less plates going into a bleach --> harder to tell when to stop?
+# less plates going into a bleach --> harder to tell when to stop? during bleach? 
 all_nocontam <- all_nocontam %>%
   mutate(person="LS")
-
 
 
 # use staging data to tell what percent of data is L1 , L2, L3, L4 
