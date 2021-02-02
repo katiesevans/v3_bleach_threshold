@@ -263,7 +263,7 @@ LS_data <- all_nocontam %>%
     dplyr::filter(contamination == FALSE,
                   call50 == "object", 
                   condition %in% c("DMSO", "water", "lyaste", "EtOH")) %>%
-    dplyr::select(date:col, condition, strain, TOF, EXT, stage) %>%
+    dplyr::select(date:col, condition, strain, TOF, EXT, green, stage) %>%
     dplyr::mutate(person = "LS") %>%
     dplyr::mutate(bleach = paste0(date, "_", assay))
 unique(LS_data$bleach)
