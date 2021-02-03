@@ -44,19 +44,30 @@ ls_l1 <- LS_data %>%
 ######
 
 ls_log <- LS_data %>%
-  dplyr::mutate(logGreen= log(green),logTOF = log(TOF), logEXT = log(EXT)) %>% # sorter doesnt cut off stages using EXT 
+  dplyr::mutate(logGreen = log(green),logTOF = log(TOF), logEXT = log(EXT)) %>% # sorter doesnt cut off stages using EXT 
   dplyr::select(logTOF, logEXT, logGreen)  %>% # taking log separates better 
   mclust::Mclust(., G=3)
 
-summary(low_log)
-#Clustering table:
-# 1    2 
-# 5191  782 
-plot(low_log)
+summary(ls_log)
+# Clustering table:
+#    1    2    3 
+# 8076 1427 1130  
+plot(ls_log)
 
 
+kse_log <- kse_data %>%
+  dplyr::mutate(green,logTOF = log(TOF), logEXT = log(EXT)) %>% # sorter doesnt cut off stages using EXT 
+  dplyr::select(logTOF, logEXT, green)  %>% # taking log separates better 
+  mclust::Mclust(., G=3)
+
+summary(kse_log)
+# Clustering table:
+#  1    2    3 
+#  5321 1220 4516 
+plot(kse_log)
 
 
+ 
 
 
 
