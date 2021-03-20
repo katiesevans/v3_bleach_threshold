@@ -1,0 +1,85 @@
+---
+title: "V3"
+author: "Loraina Stinson"
+date: "2/7/2021"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(dplyr)
+library(purrr)
+library(mclust)
+library(plotly)
+library(knitr)
+library(DT)
+load("~/Dropbox/AndersenLab/LabFolders/Loraina/v3_bleach_threshold/clusterdata.Rda")
+
+# this globally has it so all r messages do not show up :) wow amazing :) love :) 
+knitr::opts_chunk$set(message = FALSE, echo = FALSE, warning = FALSE)
+
+```
+
+
+
+```{r}
+percentl1 <- clusterdata %>%
+  dplyr::group_by(bleach) %>%
+  dplyr::summarise(L1_percent = (sum(stage == "L1")/n())*100) %>%
+  right_join(clusterdata, by = "bleach") %>%
+  dplyr::select(bleach, L1_percent, person) %>%
+  dplyr::distinct(L1_percent, bleach, person)
+
+# this is the structure I want 
+nesttest <- clusterdata %>%
+  dplyr::select(date, assay, condition, strain, bleach, logTOF, logEXT, green, person) %>%
+  dplyr::group_by(bleach) %>%
+  tidyr::nest()
+
+# PERFECT 
+new_df <- NULL
+
+for (b in 1:length(unique(nesttest$bleach[]))) {
+  df <-nesttest$data[[b]] 
+  m <- df %>%
+    dplyr::select(logTOF, logEXT, green) %>%
+    mclust::Mclust(., G=2)  # each nested df will have its own m clust obj 
+  df <- df %>%
+    bind_cols(.,as_tibble(m$classification)) %>% # add cluster class num
+    dplyr::mutate(old_class = value) 
+  dumb <- df %>% 
+    dplyr::group_by(old_class) %>% 
+    dplyr::summarise(mean=mean(logTOF)) %>% # find the mean of TOF per group 
+    dplyr::arrange(mean) %>%
+    tibble::rownames_to_column() %>%
+    dplyr::mutate(new_g=rowname) %>%
+    dplyr::select(!rowname)
+  df <- df %>%
+    merge(dumb) %>%
+    dplyr::select(!c(old_class, value))
+  badgroup_percent <- df %>% 
+    dplyr::group_by(new_g) %>% 
+    dplyr::summarise(n = n()) %>%
+    dplyr::summarise(g1_percent = (sum(df$new_g == "1") /nrow(df)*100))%>%
+    as.numeric()
+  df2 <- data.frame(badgroup_percent=badgroup_percent, bleach=nesttest$bleach[[b]]) 
+  test <- percentl1 %>%
+    dplyr::filter(bleach == nesttest$bleach[[b]])
+  final <-  merge(df2,percentl1)
+  new_df <- rbind(new_df, final) 
+}
+
+plot <- ggplot2::ggplot(new_df) +
+  aes(x=L1_percent, y=badgroup_percent, color=person, bleach = bleach) +
+  ggplot2::geom_point() +
+  ggplot2::geom_point(data = new_df %>% filter(bleach %in% c("20190926_b","20190927_b")), color = "black") + # to see where KSE's parent pheno switch
+  ggplot2::theme_bw()
+  
+  
+ggplotly(plot, tooltip = c("bleach","badgroup_percent","L1_percent")) 
+
+DT::datatable(new_df)
+  
+```
